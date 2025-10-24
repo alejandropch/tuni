@@ -3,6 +3,8 @@ package main
 import (
 	"database/sql"
 	"log"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type Todo struct {
@@ -12,7 +14,7 @@ type Todo struct {
 
 var DB *sql.DB
 
-func initDB() {
+func Init() {
 	var err error
 	DB, err = sql.Open("sqlite3", "./app.db")
 	if err != nil {
@@ -20,7 +22,7 @@ func initDB() {
 	}
 	sqlStmt := `
 	CREATE TABLE IF NOT EXISTS todos (
-		id INTENGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 		title TEXT
 	);`
 
