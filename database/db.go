@@ -1,4 +1,4 @@
-package main
+package database
 
 import (
 	"database/sql"
@@ -13,6 +13,10 @@ type Todo struct {
 }
 
 var DB *sql.DB
+
+func Database() *sql.DB {
+	return DB
+}
 
 func Init() {
 	var err error

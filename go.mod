@@ -1,4 +1,4 @@
-module alejandropch/tuni
+module tuni
 
 go 1.23.4
 
