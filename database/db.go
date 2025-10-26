@@ -1,4 +1,4 @@
-package database
+package client
 
 import (
 	"database/sql"
@@ -11,26 +11,29 @@ type Todo struct {
 	ID    int
 	Title string
 }
+type Server struct {
+	DB *sql.DB
+}
 
-var DB *sql.DB
-
-func Database() *sql.DB {
-	return DB
+func New(db *sql.DB) *Server {
+	return &Server{
+		DB: db,
+	}
 }
 
 func Init() {
-	var err error
-	DB, err = sql.Open("sqlite3", "./app.db")
+	db, err := sql.Open("sqlite3", "./app.db")
 	if err != nil {
 		log.Fatal(err)
 	}
+	server := New(db)
 	sqlStmt := `
 	CREATE TABLE IF NOT EXISTS todos (
 		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 		title TEXT
 	);`
 
-	_, err = DB.Exec(sqlStmt)
+	_, err = server.DB.Exec(sqlStmt)
 	if err != nil {
 		log.Fatalf("error creating table:\t%query: %s\n", err, sqlStmt)
 	}
