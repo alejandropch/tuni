@@ -5,12 +5,20 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	client "tuni/database"
 )
+
+type Todo struct {
+	ID    int
+	Title string
+}
+
+var server *client.Server
 
 func createHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		title := r.FormValue("title")
-		_, err := DB.Exec("INSERT INTO todos(title) VALUES(?)", title)
+		_, err := server.DB.Exec("INSERT INTO todos(title) VALUES(?)", title)
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -21,14 +29,14 @@ func createHandler(w http.ResponseWriter, r *http.Request) {
 }
 func deleteHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
-	_, err := DB.Exec("DELETE FROM todos WHERE id = (?)", id)
+	_, err := server.DB.Exec("DELETE FROM todos WHERE id = (?)", id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	rows, err := DB.Query("SELECT id, title FROM todos")
+	rows, err := server.DB.Query("SELECT id, title FROM todos")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -67,8 +75,8 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, todos)
 }
 func main() {
-	Init()
-	defer DB.Close()
+	server = client.Init()
+	defer server.DB.Close()
 
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/create", createHandler)

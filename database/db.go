@@ -7,10 +7,6 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type Todo struct {
-	ID    int
-	Title string
-}
 type Server struct {
 	DB *sql.DB
 }
@@ -21,7 +17,7 @@ func New(db *sql.DB) *Server {
 	}
 }
 
-func Init() {
+func Init() *Server {
 	db, err := sql.Open("sqlite3", "./app.db")
 	if err != nil {
 		log.Fatal(err)
@@ -37,4 +33,5 @@ func Init() {
 	if err != nil {
 		log.Fatalf("error creating table:\t%query: %s\n", err, sqlStmt)
 	}
+	return server
 }
