@@ -5,15 +5,14 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	client "tuni/database"
+
+	"github.com/gofiber/fiber"
 )
 
 type Todo struct {
 	ID    int
 	Title string
 }
-
-var server *client.Server
 
 func createHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
@@ -76,11 +75,15 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 func main() {
 	server = client.Init()
+	app := fiber.New()
+	app.Get("/ex", func(c *fiber.Ctx) error {
+		return c.SendString("Hello")
+	})
 	defer server.DB.Close()
 
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/create", createHandler)
 	http.HandleFunc("/delete", deleteHandler)
 	fmt.Println("running bro")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(app.Listen(":3000"))
 }
