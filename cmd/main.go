@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"tuni/internal/config"
 
 	"github.com/gofiber/fiber"
 )
@@ -74,12 +75,18 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, todos)
 }
 func main() {
-	server = client.Init()
+	db, err := config.InitDB("./app.db")
+	if err != nil {
+		log.Fatalf("Error when initializing the DB: %s", err)
+		return
+	}
+	appConfig := config.New(db)
+
 	app := fiber.New()
 	app.Get("/ex", func(c *fiber.Ctx) error {
 		return c.SendString("Hello")
 	})
-	defer server.DB.Close()
+	defer appConfig.DB.Close()
 
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/create", createHandler)
